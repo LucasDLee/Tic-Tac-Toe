@@ -6,14 +6,19 @@ class Board {
     public:
         Board(); //build a new tic tac toe board
         Board(char p1, char p2); //initialize a board with unique symbols
-        char getPosition(int row, int column);
         bool isEmpty();
         bool winGame();
+        char rowCombinations();
+        char columnCombinations();
+        char diagonalCombinations();
+        char getPosition(int row, int column);
+        char getWinnerSymbol();
         void placeLetter(int row, int column, char symbol);
         void printBoard();
         void clearBoard();
+        void startGame();
     private:
-        char board[3][3]; //[row][column]
+        char board[3][3] = {{'/', '/', '/'}, {'/', '/', '/'}, {'/', '/', '/'}}; //[row][column]
         char player1Symbol;
         char player2Symbol;
 };
@@ -35,10 +40,6 @@ Board::Board(char p1, char p2) {
     }
 }
 
-char Board::getPosition(int r, int c) {
-    return board[r][c];
-}
-
 bool Board::isEmpty() {
     int i = 0;
     int j = 0;
@@ -57,60 +58,52 @@ bool Board::isEmpty() {
 }
 
 bool Board::winGame() {
-    int row = 0;
-    int col = 0;
-    char playerSymbol = board[0][0];
-    for(; row < 3; col++) { //check all row combinations
-        if(col % 3 == 0) {
-            row++;
-            col = 0;
-            playerSymbol = board[row][col];
-        }
+    if(rowCombinations() != '/' || columnCombinations() != '/' || diagonalCombinations() != '/')
+        return true;
 
-        if(playerSymbol != board[row][col]) {
-            return false;
-        }
+    return false;
+}
+
+
+char Board::rowCombinations() {
+    for(int i = 0; i < 3; i++) { //check all row combinations
+        if(board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][1] != '/')
+            return board[i][1];
     }
+    return '/';
+}
 
-    row = 0;
-    col = 0;
-    playerSymbol = board[row][col];
-    for(; col < 3; row++) { //check all column combinations
-        if(row % 3 == 0) {
-            col++;
-            row = 0;
-            playerSymbol = board[row][col];
-        }
-
-        if(playerSymbol != board[row][col]) {
-            return false;
-        }
+char Board::columnCombinations() {
+    for(int i = 0; i < 3; i++) { //check all column combinations
+        if(board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[1][i] != '/')
+            return board[1][i];
     }
+    return '/';
+}
 
-    row = 0;
-    col = 0;
-    playerSymbol = board[row][col];
-    for(; col < 3; col++) { //check top-left to bottom-right diagonal
+char Board::diagonalCombinations() {
+    if(board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[1][1] != '/') //check top-left to bottom-right diagonal
+        return board[1][1];
 
-        if(playerSymbol != board[row][col]) {
-            return false;
-        }
-        row++;
-    }
+    if(board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[1][1] != '/') //check top-right to bottom-left diagonal
+        return board[1][1];
 
-    row = 0;
-    col = 2;
-    playerSymbol = board[row][col];
-    for(; col >= 0; col--) { //check top-right to bottom-left diagonal
+    return '/';
+}
 
-        if(playerSymbol != board[row][col]) {
-            return false;
-        }
+char Board::getPosition(int r, int c) {
+    return board[r][c];
+}
 
-        row++;
-    }
-
-    return true;
+char Board::getWinnerSymbol() {
+    if(rowCombinations() != '/')
+        return rowCombinations();
+    else if(columnCombinations() != '/')
+        return columnCombinations();
+    else if(diagonalCombinations() != '/')
+        return diagonalCombinations();
+    
+    return '/';
 }
 
 void Board::placeLetter(int row, int column, char symbol) {
@@ -148,4 +141,34 @@ void Board::clearBoard() {
             i = 0;
         }
     }
+}
+
+void Board::startGame() {
+    bool playAgain = true;
+    char yesNo = 'Y';
+
+    do {
+        do {
+            std::cout << "It's player 1's turn!" << std::endl;
+            printBoard();
+
+            if(!isEmpty()) {
+                break;
+            }
+        } while(!winGame());
+
+        if(getWinnerSymbol() == player1Symbol)
+            std::cout << "Player 1 won!" << std::endl;
+        else if(getWinnerSymbol() == player2Symbol)
+            std::cout << "Player 2 won!" << std::endl;
+        else    
+            std::cout << "It was a tie!" << std::endl;
+            
+        clearBoard();
+        std::cout << "Do you want to play again (Y/N)?" << std::endl;
+        std::cin >> yesNo;
+        tolower(yesNo) == 'y' ? playAgain = true : playAgain = false;
+
+    } while(playAgain);
+    std::cout << "The game has been terminated." << std::endl;
 }
