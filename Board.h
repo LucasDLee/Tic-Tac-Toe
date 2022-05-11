@@ -149,8 +149,29 @@ void Board::startGame() {
 
     do {
         do {
+            int r = 0;
+            int c = 0;
             std::cout << "It's player 1's turn!" << std::endl;
             printBoard();
+            std::cout << "Which row and column would you like to insert your value?" << std::endl;
+            do {
+                std::cout << "Row: ";
+                std::cin >> r;
+                std::cout << "Column: ";
+                std::cin >> c;
+            } while(getPosition(r, c) != '/');
+            placeLetter(r, c, player1Symbol);
+
+            std::cout << "It's player 2's turn!" << std::endl;
+            printBoard();
+            std::cout << "Which row and column would you like to insert your value?" << std::endl;
+            do {
+                std::cout << "Row: ";
+                std::cin >> r;
+                std::cout << "Column: ";
+                std::cin >> c;
+            } while(getPosition(r, c) != '/');
+            placeLetter(r, c, player2Symbol);
 
             if(!isEmpty()) {
                 break;
@@ -163,7 +184,7 @@ void Board::startGame() {
             std::cout << "Player 2 won!" << std::endl;
         else    
             std::cout << "It was a tie!" << std::endl;
-            
+
         clearBoard();
         std::cout << "Do you want to play again (Y/N)?" << std::endl;
         std::cin >> yesNo;
